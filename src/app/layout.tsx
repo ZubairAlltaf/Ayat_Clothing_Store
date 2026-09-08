@@ -27,6 +27,9 @@ export const metadata: Metadata = {
     locale: 'en_PK',
     siteName: `${SITE.name} Clothing Store`,
   },
+  verification: {
+    google: '9JVWI1myoI9NVBbzZrKD9iDBUIlUXejvUD8qvV0XALI',
+  },
 }
 
 export default function RootLayout({
