@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 import { Sparkles } from 'lucide-react'
+
+export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'Collections',
@@ -15,7 +17,10 @@ const BG_COLORS = [
 ]
 
 export default async function CollectionsPage() {
-  const supabase = await createServerSupabaseClient()
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
   const { data: collections } = await supabase
     .from('collections')
     .select('*')

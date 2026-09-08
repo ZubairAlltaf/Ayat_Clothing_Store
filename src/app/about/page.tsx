@@ -1,7 +1,9 @@
 import { SITE } from '@/lib/constants'
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
+
+export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'About',
@@ -9,7 +11,10 @@ export const metadata: Metadata = {
 }
 
 export default async function AboutPage() {
-  const supabase = await createServerSupabaseClient()
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
   const { data } = await supabase.from('site_settings').select('value').eq('key', 'about_image_url').single()
   const imageUrl = data?.value || '/images/hero_women.jpg'
 

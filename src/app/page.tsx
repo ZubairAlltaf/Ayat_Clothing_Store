@@ -2,34 +2,29 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight, Sparkles, Scissors, Shield, Truck, Clock, Star } from 'lucide-react'
 import { FABRICS } from '@/lib/constants'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 import { CountdownTimer } from '@/components/ui/CountdownTimer'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 
+export const revalidate = 60
+
 export default async function Home() {
-  const supabase = await createServerSupabaseClient()
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
   
   let featuredProducts: any[] = []
   let saleProducts: any[] = []
   let featuredReviews: any[] = []
 
-  const MOCK_FEATURED = [
-    { id: '1', name: 'Serene Bloom', slug: 'serene-bloom', gender: 'women', price: 4500, image_url: 'https://ik.imagekit.io/ids6t96oe/hero_women.jpg' },
-    { id: '2', name: 'Heritage Boski', slug: 'heritage-boski', gender: 'men', price: 6200, image_url: 'https://ik.imagekit.io/ids6t96oe/hero_men.jpg' },
-    { id: '3', name: 'Zarafshan', slug: 'zarafshan', gender: 'women', price: 12990, image_url: 'https://ik.imagekit.io/ids6t96oe/hero_women.jpg' },
-    { id: '4', name: 'Master Plan', slug: 'master-plan', gender: 'men', price: 5500, image_url: 'https://ik.imagekit.io/ids6t96oe/hero_men.jpg' },
-  ]
-  const MOCK_SALE = [
-    { id: '5', name: 'Noor-e-Aab', slug: 'noor-e-aab', gender: 'women', price: 8750, sale_price: 7875, offer_end_time: new Date(Date.now() + 86400000).toISOString(), image_url: 'https://ik.imagekit.io/ids6t96oe/hero_women.jpg' },
-    { id: '6', name: 'Little Star', slug: 'little-star', gender: 'children', price: 2800, sale_price: 2500, offer_end_time: new Date(Date.now() + 172800000).toISOString(), image_url: 'https://ik.imagekit.io/ids6t96oe/hero_men.jpg' },
-  ]
+
 
   try {
     const { data: fProducts, error: fError } = await supabase
       .from('products')
       .select('*, product_images(image_url)')
       .eq('is_active', true)
-      .eq('is_featured', true)
       .order('created_at', { ascending: false })
       .limit(4)
 
@@ -60,9 +55,6 @@ export default async function Home() {
     // Silently ignore to prevent Next.js dev overlay from showing errors
   }
 
-  // Fallback to mock data if DB is empty or disconnected
-  if (featuredProducts.length === 0) featuredProducts = MOCK_FEATURED
-  if (saleProducts.length === 0) saleProducts = MOCK_SALE
   return (
     <>
       {/* 1. EDITORIAL SPLIT HERO SECTION */}

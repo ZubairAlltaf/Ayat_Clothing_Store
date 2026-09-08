@@ -1,9 +1,11 @@
 import Link from 'next/link'
-import { Heart, ShoppingBag, ArrowRight } from 'lucide-react'
+import { Heart, ShoppingBag, ArrowRight, Filter, SlidersHorizontal, ChevronDown } from 'lucide-react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 import Image from 'next/image'
+
+export const revalidate = 60
 
 // Fallbacks for special built-in routes if not defined in the database
 const SPECIAL_ROUTES: Record<string, { title: string; description: string; eyebrow: string }> = {
@@ -24,9 +26,12 @@ const SPECIAL_ROUTES: Record<string, { title: string; description: string; eyebr
 
 export async function generateMetadata({ params }: { params: Promise<{ category: string }> }): Promise<Metadata> {
   const { category } = await params
-  const supabase = await createServerSupabaseClient()
+  const supabaseServer = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
   
-  const { data } = await supabase.from('categories').select('name, description').eq('slug', category).single()
+  const { data } = await supabaseServer.from('categories').select('name, description').eq('slug', category).single()
   
   if (data) {
     return { title: data.name, description: data.description }
@@ -40,9 +45,12 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
   return { title: 'Shop' }
 }
 
-export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
+export default async function CategoryPage({ params, searchParams }: { params: Promise<{ category: string }>; searchParams: Promise<{ [key: string]: string | undefined }> }) {
   const { category } = await params
-  const supabase = await createServerSupabaseClient()
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
 
   let meta = SPECIAL_ROUTES[category]
   let categoryId = null
@@ -77,8 +85,11 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
   let products: any[] = []
   
   try {
-    const supabase = await createServerSupabaseClient()
-    let query = supabase.from('products').select('*, product_images(image_url)').eq('is_active', true)
+    const supabaseClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+    let query = supabaseClient.from('products').select('*, product_images(image_url)').eq('is_active', true)
     
     if (category === 'new-arrivals') {
       query = query.eq('is_new_arrival', true)
