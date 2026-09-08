@@ -20,11 +20,7 @@ export default function AuthPage() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
-        if (session.user.email === 'zubairalltafdev@gmail.com') {
-          router.push('/asstories')
-        } else {
-          router.push('/')
-        }
+        router.push('/')
       }
     })
   }, [router, supabase.auth])
@@ -99,11 +95,7 @@ export default function AuthPage() {
               })
               if (signInError) throw signInError
               
-              if (email === 'zubairalltafdev@gmail.com') {
-                router.push('/asstories')
-              } else {
-                router.push('/')
-              }
+              router.push('/')
             }
           } catch (err: any) {
             setError(err.message || 'An error occurred during authentication.')

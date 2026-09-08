@@ -14,7 +14,7 @@ export async function updateSession(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: { name: string; value: string; options: any }[]) {
           cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({
             request,
@@ -40,8 +40,8 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(new URL('/auth', request.url))
       }
 
-      if (user.email === 'zubairalltafdev@gmail.com') {
-        // Hardcode admin access for the main dev email
+      if (user.email === process.env.ADMIN_EMAIL) {
+        // Environment variable admin access
       } else {
         const { data: profile } = await supabase
           .from('profiles')

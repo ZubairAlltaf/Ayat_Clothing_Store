@@ -144,13 +144,13 @@ export default function NewProductPage() {
               } else {
                 const errText = await uploadRes.text()
                 console.error('ImageKit upload failed:', errText)
-                addToast(`Image upload failed: ${file.name}`, 'error')
+                useToastStore.getState().addToast(`Image upload failed: ${file.name}`, 'error')
               }
             }
           }
         } catch (err: any) {
           console.error('Image processing error:', err)
-          addToast('One or more images failed to process correctly.', 'error')
+          useToastStore.getState().addToast('One or more images failed to process correctly.', 'error')
         }
       }
 
