@@ -84,11 +84,11 @@ export default async function CategoryPage({ params, searchParams }: { params: P
       query = query.eq('is_new_arrival', true)
     } else if (category === 'sale') {
       query = query.eq('is_on_sale', true)
+    } else if (['women', 'men', 'children'].includes(category)) {
+      query = query.eq('gender', category)
     } else if (categoryId) {
       // Dynamic database category
       query = query.eq('category_id', categoryId)
-    } else if (['women', 'men', 'children'].includes(category)) {
-      query = query.eq('gender', category)
     }
     
     const { data } = await query
