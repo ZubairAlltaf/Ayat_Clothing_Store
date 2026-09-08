@@ -6,12 +6,27 @@ import { NAV_LINKS, SITE } from '@/lib/constants'
 import { useCartStore } from '@/stores/cart-store'
 import { useUIStore } from '@/stores/ui-store'
 import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
 export default function Header() {
   const { getItemCount, openCart } = useCartStore()
   const { openMobileMenu, isMobileMenuOpen, closeMobileMenu, openSearch } = useUIStore()
   const [scrolled, setScrolled] = useState(false)
   const [itemCount, setItemCount] = useState(0)
+  const [authLink, setAuthLink] = useState('/auth')
+  const supabase = createClient()
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setAuthLink(session ? '/profile' : '/auth')
+    })
+    
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthLink(session ? '/profile' : '/auth')
+    })
+    
+    return () => subscription.unsubscribe()
+  }, [supabase.auth])
 
   useEffect(() => {
     setItemCount(getItemCount())
@@ -102,7 +117,7 @@ export default function Header() {
             </button>
 
             <Link
-              href="/auth"
+              href={authLink}
               className="hidden sm:flex p-2.5 hover:bg-charcoal/5 rounded-full transition-colors"
               aria-label="Account"
             >
@@ -160,7 +175,7 @@ export default function Header() {
               ))}
               <div className="border-t border-border mt-4 pt-4">
                 <Link
-                  href="/auth"
+                  href={authLink}
                   onClick={closeMobileMenu}
                   className="block px-6 py-3.5 text-[0.85rem] text-ink-muted hover:text-charcoal"
                 >
