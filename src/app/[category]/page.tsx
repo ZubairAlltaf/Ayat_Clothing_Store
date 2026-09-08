@@ -6,6 +6,33 @@ import { createClient } from '@supabase/supabase-js'
 import Image from 'next/image'
 
 export const revalidate = 60
+export const dynamicParams = true
+
+export async function generateStaticParams() {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  )
+  const { data: categories } = await supabase.from('categories').select('slug')
+  
+  const staticParams = [
+    { category: 'women' },
+    { category: 'men' },
+    { category: 'children' },
+    { category: 'new-arrivals' },
+    { category: 'sale' },
+  ]
+  
+  if (categories) {
+    for (const cat of categories) {
+      if (!staticParams.find(p => p.category === cat.slug)) {
+        staticParams.push({ category: cat.slug })
+      }
+    }
+  }
+
+  return staticParams
+}
 
 // Fallbacks for special built-in routes if not defined in the database
 const SPECIAL_ROUTES: Record<string, { title: string; description: string; eyebrow: string }> = {
@@ -45,7 +72,7 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
   return { title: 'Shop' }
 }
 
-export default async function CategoryPage({ params, searchParams }: { params: Promise<{ category: string }>; searchParams: Promise<{ [key: string]: string | undefined }> }) {
+export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
   const { category } = await params
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
