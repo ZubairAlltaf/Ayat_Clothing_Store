@@ -97,6 +97,15 @@ export default function AuthPage() {
                 }
               })
               if (signUpError) throw signUpError
+              
+              if (data.user) {
+                await supabase.from('profiles').upsert({
+                  id: data.user.id,
+                  full_name: fullName,
+                  phone: phone
+                }, { onConflict: 'id' })
+              }
+
               router.push('/')
             } else {
               // Pre-check if user email exists

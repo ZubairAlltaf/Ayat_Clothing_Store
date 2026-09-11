@@ -62,9 +62,10 @@ export default function CompleteProfilePage() {
             // Also update the profiles table if necessary
             const { data: { user } } = await supabase.auth.getUser()
             if (user) {
-              await supabase.from('profiles').update({
+              await supabase.from('profiles').upsert({
+                id: user.id,
                 phone: phone
-              }).eq('id', user.id)
+              }, { onConflict: 'id' })
             }
 
             router.push('/')
