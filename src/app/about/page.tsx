@@ -75,6 +75,32 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
+
+      {/* Operations & Contact */}
+      <section className="py-20 lg:py-28 px-5 lg:px-10 border-t border-border">
+        <div className="max-w-[900px] mx-auto text-center">
+          <h2 className="font-serif text-[1.6rem] lg:text-[2rem] text-charcoal mb-6">Our Operations</h2>
+          <p className="text-sm text-ink-muted leading-relaxed mb-10 max-w-[600px] mx-auto">
+            Based in the heart of Pakistan, AYAT Clothing Store proudly serves customers nationwide. From our design studios to your doorstep, we oversee every step of the journey to ensure your premium garments arrive in pristine condition within 2-5 working days.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-8 text-charcoal">
+            <div className="text-center">
+              <span className="block font-serif text-lg mb-2">Location</span>
+              <span className="text-sm text-ink-muted">Lahore, Pakistan</span>
+            </div>
+            <div className="hidden sm:block w-px bg-border"></div>
+            <div className="text-center">
+              <span className="block font-serif text-lg mb-2">Delivery</span>
+              <span className="text-sm text-ink-muted">Nationwide Delivery</span>
+            </div>
+            <div className="hidden sm:block w-px bg-border"></div>
+            <div className="text-center">
+              <span className="block font-serif text-lg mb-2">Support</span>
+              <span className="text-sm text-ink-muted">ayatasad0304@gmail.com</span>
+            </div>
+          </div>
+        </div>
+      </section>
     </>
   )
 }
