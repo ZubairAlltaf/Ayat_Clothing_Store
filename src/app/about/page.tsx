@@ -86,7 +86,7 @@ export default async function AboutPage() {
           <div className="flex flex-col sm:flex-row justify-center gap-8 text-charcoal">
             <div className="text-center">
               <span className="block font-serif text-lg mb-2">Location</span>
-              <span className="text-sm text-ink-muted">Lahore, Pakistan</span>
+              <span className="text-sm text-ink-muted">Bahawalpur, Pakistan</span>
             </div>
             <div className="hidden sm:block w-px bg-border"></div>
             <div className="text-center">
