@@ -25,6 +25,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
       }
     ],
-    sitemap: 'https://ayatclothing.com/sitemap.xml',
+    sitemap: 'https://ayatclothing.store/sitemap.xml',
   }
 }

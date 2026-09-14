@@ -58,6 +58,7 @@ export default async function Home() {
   return (
     <>
       {/* 1. EDITORIAL SPLIT HERO SECTION */}
+      <h1 className="sr-only">Ayat Clothing Store - Premium Pakistani Clothing Online</h1>
       <section className="relative min-h-[90vh] lg:min-h-screen flex flex-col lg:flex-row w-full bg-charcoal overflow-hidden">
         {/* Left: Women's Editorial */}
         <Link href="/women" className="group relative flex-1 min-h-[50vh] lg:min-h-full overflow-hidden block">

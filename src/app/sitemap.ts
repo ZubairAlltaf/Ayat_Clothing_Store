@@ -4,7 +4,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 export const dynamic = 'force-dynamic'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://ayatclothing.com'
+  const baseUrl = 'https://ayatclothing.store'
 
   const staticPages = [
     '', '/women', '/men', '/children', '/new-arrivals',

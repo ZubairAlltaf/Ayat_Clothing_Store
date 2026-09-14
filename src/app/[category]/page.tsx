@@ -42,13 +42,13 @@ const SPECIAL_ROUTES: Record<string, { title: string; description: string; eyebr
     eyebrow: 'Just In',
   },
   sale: {
-    title: 'Sale',
+    title: 'Sale Clothing Online',
     description: 'Selected pieces at special prices — the same AYAT quality, exceptional value.',
     eyebrow: 'Limited Time',
   },
-  women: { title: "Women's Couture", description: 'Curated ensembles.', eyebrow: "Women's" },
-  men: { title: "Men's Heritage", description: 'Timeless fabrics.', eyebrow: "Men's" },
-  children: { title: "Children's", description: 'Comfortable outfits.', eyebrow: "Children's" },
+  women: { title: "Women's Clothing Online", description: 'Shop premium women\'s Pakistani clothing, elegant suits and curated ensembles.', eyebrow: "Women's" },
+  men: { title: "Men's Clothing Online", description: 'Shop timeless men\'s Pakistani clothing, traditional fabrics and classic tailoring.', eyebrow: "Men's" },
+  children: { title: "Kids Clothing Online", description: 'Shop comfortable and stylish children\'s outfits and dresses.', eyebrow: "Children's" },
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ category: string }> }): Promise<Metadata> {
@@ -61,7 +61,7 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
   const { data } = await supabaseServer.from('categories').select('name, description').eq('slug', category).single()
   
   if (data) {
-    return { title: data.name, description: data.description }
+    return { title: `${data.name} Clothing Online`, description: data.description }
   }
   
   const special = SPECIAL_ROUTES[category]

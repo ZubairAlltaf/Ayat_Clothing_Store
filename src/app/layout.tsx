@@ -18,10 +18,10 @@ const jakarta = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: `${SITE.name} — Premium Pakistani Clothing`,
-    template: `%s | ${SITE.name}`,
+    default: 'Ayat Clothing Store | Premium Pakistani Clothing Online',
+    template: '%s | Ayat Clothing Store',
   },
-  description: SITE.description,
+  description: 'Shop Ayat Clothing Store for premium Pakistani clothing, elegant suits and curated collections. Discover new arrivals, exclusive styles and nationwide delivery.',
   openGraph: {
     type: 'website',
     locale: 'en_PK',
@@ -40,6 +40,27 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${playfair.variable} ${jakarta.variable}`}>
       <body className="min-h-screen flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "Ayat Clothing Store",
+              "url": "https://ayatclothing.store",
+              "logo": "https://ayatclothing.store/logo.png",
+              "sameAs": [
+                "https://instagram.com/ayatclothingstore",
+                "https://facebook.com/ayatclothingstore"
+              ],
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "telephone": "+92-300-1234567",
+                "contactType": "customer service"
+              }
+            })
+          }}
+        />
         <StoreLayout>
           {children}
         </StoreLayout>
