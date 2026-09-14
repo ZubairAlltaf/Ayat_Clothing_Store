@@ -7,8 +7,6 @@ const shopLinks = [
   { label: 'Women', href: '/women' },
   { label: 'Men', href: '/men' },
   { label: 'Children', href: '/children' },
-  { label: 'Unstitched', href: '/unstitched' },
-  { label: 'Ready to Wear', href: '/ready-to-wear' },
   { label: 'Sale', href: '/sale' },
 ]
 

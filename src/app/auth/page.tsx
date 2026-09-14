@@ -86,7 +86,7 @@ export default function AuthPage() {
           
           try {
             if (mode === 'signup') {
-              const { error: signUpError } = await supabase.auth.signUp({
+              const { data, error: signUpError } = await supabase.auth.signUp({
                 email,
                 password,
                 options: {
