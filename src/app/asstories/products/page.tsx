@@ -51,17 +51,31 @@ export default function AdminProductsPage() {
   const deleteProduct = async (id: string) => {
     if (!confirm('Are you sure you want to delete this product? This will soft-delete it (mark as inactive).')) return
     setDeleting(id)
-    await supabase.from('products').update({ is_active: false }).eq('id', id)
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, is_active: false } : p))
+    const { error } = await supabase.from('products').update({ is_active: false }).eq('id', id)
+    
+    if (error) {
+      alert(`Could not soft-delete product: ${error.message}`)
+    } else {
+      setProducts(prev => prev.map(p => p.id === id ? { ...p, is_active: false } : p))
+    }
     setDeleting(null)
   }
 
   const hardDelete = async (id: string) => {
-    if (!confirm('⚠️ PERMANENTLY delete this product and all its images? This cannot be undone.')) return
+    if (!confirm('⚠️ PERMANENTLY delete this product and all its images/variants? This cannot be undone.')) return
     setDeleting(id)
+    
+    await supabase.from('product_variants').delete().eq('product_id', id)
     await supabase.from('product_images').delete().eq('product_id', id)
-    await supabase.from('products').delete().eq('id', id)
-    setProducts(prev => prev.filter(p => p.id !== id))
+    
+    const { error } = await supabase.from('products').delete().eq('id', id)
+    
+    if (error) {
+      alert(`Could not delete product: ${error.message}. It might be tied to an existing order. Please use Soft Delete (the eye icon) instead.`)
+    } else {
+      setProducts(prev => prev.filter(p => p.id !== id))
+    }
+    
     setDeleting(null)
   }
 
