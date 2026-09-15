@@ -1,11 +1,13 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Package, ShoppingCart, CreditCard,
   FolderOpen, Layers, Tag, Star, Users, Image,
-  Mail, Settings, ChevronLeft
+  Mail, Settings, ChevronLeft, Menu, X
 } from 'lucide-react'
 
 const sidebarLinks = [
@@ -25,14 +27,44 @@ const sidebarLinks = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  // Close menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false)
+  }, [pathname])
 
   return (
-    <div className="min-h-screen bg-[#f8f7f5] flex">
-      {/* Sidebar */}
-      <aside className="hidden lg:flex w-[260px] bg-charcoal text-champagne flex-col shrink-0">
-        <div className="p-6 border-b border-champagne/10">
+    <div className="min-h-screen bg-[#f8f7f5] flex flex-col lg:flex-row">
+      {/* Mobile Header */}
+      <header className="lg:hidden bg-charcoal text-champagne p-4 flex items-center justify-between z-20 border-b border-champagne/10 sticky top-0">
+        <div>
           <Link href="/asstories" className="font-serif text-xl tracking-wide">AYAT</Link>
           <p className="eyebrow text-[0.5rem] text-champagne/40 mt-0.5">Admin Dashboard</p>
+        </div>
+        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 text-champagne">
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </header>
+
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`${isMobileMenuOpen ? 'flex' : 'hidden'} lg:flex fixed lg:sticky top-0 h-screen z-40 w-[260px] bg-charcoal text-champagne flex-col shrink-0`}>
+        <div className="p-6 border-b border-champagne/10 flex justify-between items-center">
+          <div>
+            <Link href="/asstories" className="font-serif text-xl tracking-wide">AYAT</Link>
+            <p className="eyebrow text-[0.5rem] text-champagne/40 mt-0.5">Admin Dashboard</p>
+          </div>
+          <button onClick={() => setIsMobileMenuOpen(false)} className="lg:hidden p-1 text-champagne">
+            <X size={20} />
+          </button>
         </div>
         <nav className="flex-1 py-4 overflow-y-auto">
           {sidebarLinks.map((link) => {
