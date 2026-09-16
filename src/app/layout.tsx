@@ -1,7 +1,5 @@
 import type { Metadata } from 'next'
 import { Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google'
-import { Toaster } from 'sonner'
-import AuthProvider from '@/components/providers/AuthProvider'
 import ChatWidget from '@/components/chat/ChatWidget'
 import '@/styles/globals.css'
 import StoreLayout from '@/components/layout/StoreLayout'
@@ -64,13 +62,10 @@ export default function RootLayout({
             })
           }}
         />
-        <AuthProvider>
-          <StoreLayout>
-            {children}
-          </StoreLayout>
-          <ChatWidget />
-        </AuthProvider>
-        <Toaster position="bottom-center" />
+        <StoreLayout>
+          {children}
+        </StoreLayout>
+        <ChatWidget />
       </body>
     </html>
   )

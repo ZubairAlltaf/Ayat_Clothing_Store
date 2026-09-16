@@ -179,7 +179,6 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                     sizes="(max-width: 1024px) 50vw, 25vw"
-                    onContextMenu={(e) => e.preventDefault()}
                     draggable={false}
                   />
                   {product.stock_quantity <= 0 && (
