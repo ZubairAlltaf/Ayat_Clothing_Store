@@ -80,7 +80,7 @@ export default function NewProductPage() {
         .from('products')
         .insert({
           name: form.name,
-          slug: form.slug || form.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+          slug: (form.slug || form.name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
           description: form.description || null,
           short_description: form.shortDescription || null,
           fabric: form.fabric || null,

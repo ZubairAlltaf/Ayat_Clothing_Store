@@ -115,7 +115,7 @@ export default function EditProductPage() {
         .from('products')
         .update({
           name: form.name,
-          slug: form.slug || form.name.toLowerCase().replace(/\s+/g, '-'),
+          slug: (form.slug || form.name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
           description: form.description,
           short_description: form.shortDescription,
           fabric: form.fabric,
