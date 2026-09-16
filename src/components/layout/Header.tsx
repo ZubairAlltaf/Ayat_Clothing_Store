@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Search, User, Heart, ShoppingBag, Menu, X } from 'lucide-react'
+import { Search, User, Heart, ShoppingBag, Menu, X, Phone } from 'lucide-react'
 import { NAV_LINKS, SITE } from '@/lib/constants'
 import { useCartStore } from '@/stores/cart-store'
 import { useUIStore } from '@/stores/ui-store'
@@ -108,6 +108,18 @@ export default function Header() {
 
           {/* Icons */}
           <div className="flex items-center gap-1 lg:gap-3">
+            <button
+              onClick={() => {
+                const text = encodeURIComponent('Hello, I have a question about Ayat Clothing Store.')
+                window.open(`https://wa.me/${SITE.whatsapp}?text=${text}`, '_blank')
+              }}
+              className="p-2.5 text-[#25D366] hover:bg-charcoal/5 rounded-full transition-colors hidden sm:flex"
+              aria-label="WhatsApp"
+              title="WhatsApp Us"
+            >
+              <Phone size={20} strokeWidth={1.5} />
+            </button>
+
             <button
               onClick={openSearch}
               className="p-2.5 hover:bg-charcoal/5 rounded-full transition-colors"

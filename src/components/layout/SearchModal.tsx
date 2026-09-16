@@ -12,47 +12,49 @@ export default function SearchModal() {
   const { isSearchOpen, closeSearch } = useUIStore()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<any[]>([])
-  const [loading, setLoading] = useState(false)
+  const [catalog, setCatalog] = useState<any[]>([])
+  const [isCatalogLoaded, setIsCatalogLoaded] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const supabase = createClient()
 
-  // Focus input when modal opens
+  // Focus input when modal opens and preload catalog
   useEffect(() => {
     if (isSearchOpen) {
       setTimeout(() => inputRef.current?.focus(), 100)
+      if (!isCatalogLoaded) {
+        loadCatalog()
+      }
     } else {
       setQuery('')
       setResults([])
     }
   }, [isSearchOpen])
 
-  // Debounced search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (query.trim().length > 1) {
-        performSearch(query)
-      } else {
-        setResults([])
-      }
-    }, 300)
-
-    return () => clearTimeout(timer)
-  }, [query])
-
-  const performSearch = async (searchTerm: string) => {
-    setLoading(true)
-    const { data, error } = await supabase
+  const loadCatalog = async () => {
+    const { data } = await supabase
       .from('products')
       .select('id, name, slug, price, sale_price, product_images(image_url)')
-      .ilike('name', `%${searchTerm}%`)
-      .limit(6)
-
-    if (!error && data) {
-      setResults(data)
+      .eq('is_active', true)
+    
+    if (data) {
+      setCatalog(data)
+      setIsCatalogLoaded(true)
     }
-    setLoading(false)
   }
+
+  // Instant local search
+  useEffect(() => {
+    if (query.trim().length > 1) {
+      const term = query.toLowerCase()
+      const filtered = catalog
+        .filter(p => p.name.toLowerCase().includes(term))
+        .slice(0, 6)
+      setResults(filtered)
+    } else {
+      setResults([])
+    }
+  }, [query, catalog])
 
   const handleClose = () => {
     closeSearch()
@@ -81,10 +83,10 @@ export default function SearchModal() {
 
       <div className="flex-1 overflow-y-auto p-6 md:p-12">
         <div className="max-w-4xl mx-auto">
-          {loading ? (
+          {!isCatalogLoaded && query.trim().length > 1 ? (
             <div className="flex flex-col items-center justify-center py-20 text-ink-muted">
               <Loader2 className="animate-spin mb-4" size={32} />
-              <p>Searching for {query}...</p>
+              <p>Preparing search...</p>
             </div>
           ) : results.length > 0 ? (
             <div>

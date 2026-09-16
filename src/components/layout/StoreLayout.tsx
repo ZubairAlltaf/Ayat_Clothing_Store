@@ -5,6 +5,7 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import CartDrawer from '@/components/cart/CartDrawer'
 import SearchModal from '@/components/layout/SearchModal'
+import WhatsAppButton from '@/components/ui/WhatsAppButton'
 import ToastContainer from '@/components/ui/ToastContainer'
 
 import SmoothScroll from '@/components/layout/SmoothScroll'
@@ -31,6 +32,7 @@ export default function StoreLayout({
       <Footer />
       <CartDrawer />
       <SearchModal />
+      <WhatsAppButton />
       <ToastContainer />
     </SmoothScroll>
   )

@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { MessageCircle, X, Send, Phone } from 'lucide-react'
-import { SITE } from '@/lib/constants'
+import { useState, useEffect } from 'react'
+import { MessageCircle, X, Send, User } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false)
@@ -11,6 +11,37 @@ export default function ChatWidget() {
   const [message, setMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  
+  const [activeQuery, setActiveQuery] = useState<any>(null)
+  const [loadingHistory, setLoadingHistory] = useState(false)
+  
+  const supabase = createClient()
+
+  // Load active chat session on mount or open
+  useEffect(() => {
+    if (isOpen) {
+      loadActiveSession()
+    }
+  }, [isOpen])
+
+  const loadActiveSession = async () => {
+    const queryId = localStorage.getItem('ayat_chat_id')
+    if (queryId) {
+      setLoadingHistory(true)
+      const { data } = await supabase
+        .from('support_queries')
+        .select('*')
+        .eq('id', queryId)
+        .single()
+        
+      if (data) {
+        setActiveQuery(data)
+      } else {
+        localStorage.removeItem('ayat_chat_id')
+      }
+      setLoadingHistory(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -18,15 +49,20 @@ export default function ChatWidget() {
 
     setIsSubmitting(true)
     try {
-      const res = await fetch('/api/support', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, contact, message })
-      })
-      if (res.ok) {
+      const { data, error } = await supabase
+        .from('support_queries')
+        .insert([{ name, contact_method: contact, message }])
+        .select()
+        .single()
+        
+      if (error) throw error
+      
+      if (data) {
+        localStorage.setItem('ayat_chat_id', data.id)
+        setActiveQuery(data)
         setIsSuccess(true)
-      } else {
-        alert('Failed to send message. Please try again.')
+        // Reset fields for future
+        setMessage('')
       }
     } catch (err) {
       console.error(err)
@@ -35,10 +71,11 @@ export default function ChatWidget() {
       setIsSubmitting(false)
     }
   }
-
-  const handleWhatsApp = () => {
-    const text = encodeURIComponent('Hello, I have a question about Ayat Clothing Store.')
-    window.open(`https://wa.me/${SITE.whatsapp}?text=${text}`, '_blank')
+  
+  const clearSession = () => {
+    localStorage.removeItem('ayat_chat_id')
+    setActiveQuery(null)
+    setIsSuccess(false)
   }
 
   return (
@@ -49,21 +86,69 @@ export default function ChatWidget() {
           <div className="bg-charcoal text-champagne p-4 flex items-center justify-between">
             <div>
               <h3 className="font-serif font-medium">Ayat Support</h3>
-              <p className="text-xs text-champagne/70">We typically reply in a few minutes.</p>
+              <p className="text-xs text-champagne/70">
+                {activeQuery ? 'Your active ticket' : 'We typically reply in a few minutes.'}
+              </p>
             </div>
             <button onClick={() => setIsOpen(false)} className="text-champagne/70 hover:text-champagne transition-colors">
               <X size={20} />
             </button>
           </div>
 
-          <div className="p-4 flex-1 bg-parchment/30">
-            {isSuccess ? (
+          <div className="p-4 flex-1 bg-parchment/30 max-h-[400px] overflow-y-auto">
+            {loadingHistory ? (
+              <div className="flex justify-center py-10 text-ink-muted text-sm">Loading chat...</div>
+            ) : activeQuery ? (
+              <div className="space-y-4">
+                {/* User Message */}
+                <div className="flex flex-col items-end">
+                  <span className="text-[0.65rem] text-ink-muted mb-1 px-1">You</span>
+                  <div className="bg-emerald-deep text-champagne p-3 rounded-l-lg rounded-br-lg text-sm max-w-[85%]">
+                    {activeQuery.message}
+                  </div>
+                  <span className="text-[0.6rem] text-ink-faint mt-1">
+                    {new Date(activeQuery.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                  </span>
+                </div>
+                
+                {/* Admin Reply or Pending */}
+                <div className="flex flex-col items-start mt-4">
+                  <span className="text-[0.65rem] text-ink-muted mb-1 px-1">Ayat Support</span>
+                  {activeQuery.admin_reply ? (
+                    <>
+                      <div className="bg-white border border-border text-charcoal p-3 rounded-r-lg rounded-bl-lg text-sm max-w-[85%] shadow-sm">
+                        {activeQuery.admin_reply}
+                      </div>
+                      {activeQuery.replied_at && (
+                        <span className="text-[0.6rem] text-ink-faint mt-1">
+                          {new Date(activeQuery.replied_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <div className="bg-white border border-border text-ink-muted p-3 rounded-r-lg rounded-bl-lg text-xs italic max-w-[85%] shadow-sm">
+                      Our team is reviewing your message and will reply here soon. Feel free to check back later!
+                    </div>
+                  )}
+                </div>
+                
+                {/* Footer for active query */}
+                <div className="pt-6 text-center border-t border-border/50 mt-6">
+                  {activeQuery.status === 'resolved' ? (
+                    <p className="text-xs text-sage font-medium mb-3">This ticket has been marked resolved.</p>
+                  ) : null}
+                  <button onClick={clearSession} className="text-xs text-ink-muted hover:text-charcoal underline">
+                    Start a new conversation
+                  </button>
+                </div>
+              </div>
+            ) : isSuccess ? (
               <div className="text-center py-8">
                 <div className="w-12 h-12 bg-emerald-deep/10 text-emerald-deep rounded-full flex items-center justify-center mx-auto mb-3">
                   <Send size={20} className="ml-1" />
                 </div>
                 <h4 className="font-medium text-charcoal mb-1">Message Sent!</h4>
-                <p className="text-xs text-ink-muted">Our agent will reply to your contact method shortly. For a faster reply, please use WhatsApp.</p>
+                <p className="text-xs text-ink-muted">Our agent will reply here shortly.</p>
                 <button onClick={() => setIsSuccess(false)} className="mt-4 text-xs text-emerald-deep font-medium hover:underline">
                   Send another message
                 </button>
@@ -112,20 +197,6 @@ export default function ChatWidget() {
                 </button>
               </form>
             )}
-
-            <div className="relative flex items-center py-4">
-              <div className="flex-grow border-t border-border"></div>
-              <span className="shrink-0 px-2 text-[0.65rem] text-ink-faint uppercase tracking-wider">or preferred</span>
-              <div className="flex-grow border-t border-border"></div>
-            </div>
-
-            <button
-              onClick={handleWhatsApp}
-              type="button"
-              className="w-full bg-[#25D366] text-white py-2.5 text-xs font-medium hover:bg-[#128C7E] transition-colors flex items-center justify-center gap-2"
-            >
-              <Phone size={14} /> WhatsApp Us directly
-            </button>
           </div>
         </div>
       )}

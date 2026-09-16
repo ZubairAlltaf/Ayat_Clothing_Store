@@ -18,11 +18,13 @@ type Query = {
   message: string
   status: 'open' | 'resolved'
   created_at: string
+  admin_reply?: string | null
 }
 
 export default function MessagesPage() {
   const [queries, setQueries] = useState<Query[]>([])
   const [loading, setLoading] = useState(true)
+  const [replyText, setReplyText] = useState<{ [key: string]: string }>({})
 
   useEffect(() => {
     fetchQueries()
@@ -49,6 +51,22 @@ export default function MessagesPage() {
       
     if (!error) {
       setQueries(queries.map(q => q.id === id ? { ...q, status: 'resolved' } : q))
+    }
+  }
+
+  const sendReply = async (id: string) => {
+    const reply = replyText[id]
+    if (!reply) return
+
+    const { error } = await supabase
+      .from('support_queries')
+      .update({ admin_reply: reply, replied_at: new Date().toISOString() })
+      .eq('id', id)
+
+    if (!error) {
+      setQueries(queries.map(q => q.id === id ? { ...q, admin_reply: reply } : q))
+    } else {
+      alert('Failed to send reply. Please try again.')
     }
   }
 
@@ -103,7 +121,7 @@ export default function MessagesPage() {
                       {q.message}
                     </p>
                     
-                    <div className="flex items-center gap-2 text-xs text-ink-muted">
+                    <div className="flex items-center gap-2 text-xs text-ink-muted mb-4">
                       <span>Contact: <strong>{q.contact_method}</strong></span>
                       <button 
                         onClick={() => handleReplyWhatsApp(q.contact_method)}
@@ -112,6 +130,30 @@ export default function MessagesPage() {
                         <ExternalLink size={12} /> Reply externally
                       </button>
                     </div>
+
+                    {/* Admin Reply Section */}
+                    {q.admin_reply ? (
+                      <div className="bg-charcoal/5 border border-border rounded-l-lg rounded-br-lg p-4 max-w-[80%] ml-8 mt-2">
+                        <span className="text-xs font-bold text-charcoal mb-1 block">Your Reply:</span>
+                        <p className="text-sm text-charcoal">{q.admin_reply}</p>
+                      </div>
+                    ) : q.status === 'open' ? (
+                      <div className="mt-4 flex flex-col gap-2 max-w-[80%]">
+                        <textarea
+                          placeholder="Type your reply here..."
+                          rows={2}
+                          value={replyText[q.id] || ''}
+                          onChange={(e) => setReplyText({ ...replyText, [q.id]: e.target.value })}
+                          className="w-full border border-border px-3 py-2 text-sm outline-none focus:border-emerald-deep resize-none bg-white"
+                        />
+                        <button
+                          onClick={() => sendReply(q.id)}
+                          className="self-start bg-emerald-deep text-champagne px-4 py-1.5 text-xs font-medium hover:bg-emerald-deep/90 transition-colors"
+                        >
+                          Send Reply
+                        </button>
+                      </div>
+                    ) : null}
                   </div>
                   
                   {q.status === 'open' ? (
