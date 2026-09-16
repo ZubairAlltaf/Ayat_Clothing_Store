@@ -2,10 +2,10 @@ export const SITE = {
   name: 'AYAT',
   tagline: 'Clothing Store',
   description: 'Premium Pakistani clothing — timeless designs, finest fabrics, crafted for the modern wardrobe.',
-  url: 'https://ayatclothing.com',
+  url: 'https://ayatclothing.store',
   phone: '03049676311',
   whatsapp: '923049676311',
-  email: 'info@ayatclothing.com',
+  email: 'ayatasad0304@gmail.com',
 } as const
 
 export const PAYMENT = {

@@ -12,7 +12,7 @@ const shopLinks = [
 
 const careLinks = [
   { label: 'Contact Us', href: '/contact' },
-  { label: 'FAQs', href: '/contact' },
+  { label: 'FAQs', href: '/faq' },
   { label: 'Shipping & Delivery', href: '/shipping' },
   { label: 'Returns & Exchange', href: '/returns' },
   { label: 'Size Guide', href: '/size-guide' },
@@ -116,6 +116,10 @@ export default function Footer() {
             <Link href="/terms" className="hover:text-champagne/60 transition-colors">
               Terms & Conditions
             </Link>
+          </div>
+          <div className="flex gap-4 mt-4 sm:mt-0">
+            <a href="https://instagram.com/ayatclothingstore" target="_blank" rel="noopener noreferrer" className="hover:text-champagne/60 transition-colors">Instagram</a>
+            <a href="https://facebook.com/ayatclothingstore" target="_blank" rel="noopener noreferrer" className="hover:text-champagne/60 transition-colors">Facebook</a>
           </div>
         </div>
       </div>

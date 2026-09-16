@@ -52,92 +52,37 @@ interface ProductVariant {
   price_adjustment: number
 }
 
-export default function ProductPage() {
-  const params = useParams()
-  const slug = params?.slug as string
+interface ProductClientProps {
+  initialProduct: Product
+  initialImages: ProductImage[]
+  initialVariants: ProductVariant[]
+  initialRelated: any[]
+}
 
-  const [product, setProduct] = useState<Product | null>(null)
-  const [images, setImages] = useState<ProductImage[]>([])
-  const [variants, setVariants] = useState<ProductVariant[]>([])
-  const [relatedProducts, setRelatedProducts] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [notFound, setNotFound] = useState(false)
-
-  const [selectedColor, setSelectedColor] = useState<string | null>(null)
-  const [quantity, setQuantity] = useState(1)
+export default function ProductClient({ 
+  initialProduct, 
+  initialImages, 
+  initialVariants, 
+  initialRelated 
+}: ProductClientProps) {
+  const addItem = useCartStore((state) => state.addItem)
+  const [product, setProduct] = useState<Product | null>(initialProduct)
+  const [images, setImages] = useState<ProductImage[]>(initialImages)
+  const [variants, setVariants] = useState<ProductVariant[]>(initialVariants)
+  const [relatedProducts, setRelatedProducts] = useState<any[]>(initialRelated)
   const [activeImage, setActiveImage] = useState(0)
-  const [openSection, setOpenSection] = useState<string | null>('description')
-  const addItem = useCartStore((s) => s.addItem)
-
-  const supabase = createClient()
-
+  const [selectedColor, setSelectedColor] = useState<string>('')
+  const [quantity, setQuantity] = useState(1)
+  const [openSection, setOpenSection] = useState<string | null>('details')
+  const [loading, setLoading] = useState(false)
+  const [notFound, setNotFound] = useState(!initialProduct)
   useEffect(() => {
-    const load = async () => {
-      setLoading(true)
-      // Fetch product
-      const { data: prod, error } = await supabase
-        .from('products')
-        .select('*, categories(name, slug)')
-        .eq('slug', slug)
-        .single()
-
-      if (error || !prod) {
-        setNotFound(true)
-        setLoading(false)
-        return
-      }
-      setProduct(prod)
-
-      // Fetch images
-      const { data: imgs } = await supabase
-        .from('product_images')
-        .select('*')
-        .eq('product_id', prod.id)
-        .order('position')
-      if (imgs) setImages(imgs)
-
-      // Fetch variants
-      const { data: vars } = await supabase
-        .from('product_variants')
-        .select('*')
-        .eq('product_id', prod.id)
-      if (vars) {
-        setVariants(vars)
-        // Set first color as default
-        const colors = vars.filter(v => v.color).map(v => v.color!)
-        if (colors.length > 0) setSelectedColor(colors[0])
-      }
-
-      // Fetch related products (same category)
-      if (prod.category_id) {
-        const { data: related } = await supabase
-          .from('products')
-          .select('id, name, slug, price, sale_price, is_new_arrival, is_on_sale')
-          .eq('category_id', prod.category_id)
-          .eq('is_active', true)
-          .neq('id', prod.id)
-          .limit(4)
-
-        if (related && related.length > 0) {
-          // Fetch primary image for each related product
-          const relatedIds = related.map(r => r.id)
-          const { data: relImgs } = await supabase
-            .from('product_images')
-            .select('product_id, image_url')
-            .in('product_id', relatedIds)
-            .eq('is_primary', true)
-
-          const imgMap: Record<string, string> = {}
-          relImgs?.forEach(img => { imgMap[img.product_id] = img.image_url })
-
-          setRelatedProducts(related.map(r => ({ ...r, image_url: imgMap[r.id] || null })))
-        }
-      }
-
-      setLoading(false)
+    // Select first available color by default
+    if (variants.length > 0) {
+      const availableColor = variants.find(v => v.stock_quantity > 0)?.color
+      if (availableColor) setSelectedColor(availableColor)
     }
-    if (slug) load()
-  }, [slug])
+  }, [variants])
 
   const handleAddToCart = () => {
     if (!product) return
@@ -206,7 +151,7 @@ export default function ProductPage() {
           {/* Left: Image Gallery */}
           <div>
             {/* Main Image */}
-            <div className="aspect-square bg-parchment mb-3 overflow-hidden relative">
+            <div className="aspect-[3/4] bg-parchment mb-3 overflow-hidden relative">
               {images.length > 0 ? (
                 <Image
                   src={images[activeImage]?.image_url}

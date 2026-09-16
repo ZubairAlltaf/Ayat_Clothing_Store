@@ -34,6 +34,40 @@ export async function generateStaticParams() {
   return staticParams
 }
 
+export async function generateMetadata({ params }: { params: Promise<{ category: string }> }): Promise<Metadata> {
+  const { category } = await params
+  
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  )
+  
+  // Try finding the category in DB
+  const { data: cat } = await supabase.from('categories').select('name, description').eq('slug', category).single()
+
+  let title = cat?.name || category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+  let description = cat?.description || `Shop premium ${title.toLowerCase()} at Ayat Clothing Store. Discover timeless designs and the finest fabrics.`
+
+  // Override for special built-in routes
+  if (category === 'new-arrivals') {
+    title = 'New Arrivals'
+    description = 'Shop the latest premium Pakistani clothing arrivals at Ayat Clothing Store.'
+  } else if (category === 'sale') {
+    title = 'Sale'
+    description = 'Shop premium Pakistani clothing on sale at Ayat Clothing Store. Limited time offers.'
+  }
+
+  return {
+    title: `${title} | Ayat Clothing Store`,
+    description,
+    openGraph: {
+      title: `${title} | Ayat Clothing Store`,
+      description,
+      type: 'website',
+    }
+  }
+}
+
 // Fallbacks for special built-in routes if not defined in the database
 const SPECIAL_ROUTES: Record<string, { title: string; description: string; eyebrow: string }> = {
   'new-arrivals': {
@@ -49,27 +83,6 @@ const SPECIAL_ROUTES: Record<string, { title: string; description: string; eyebr
   women: { title: "Women's Clothing Online", description: 'Shop premium women\'s Pakistani clothing, elegant suits and curated ensembles.', eyebrow: "Women's" },
   men: { title: "Men's Clothing Online", description: 'Shop timeless men\'s Pakistani clothing, traditional fabrics and classic tailoring.', eyebrow: "Men's" },
   children: { title: "Kids Clothing Online", description: 'Shop comfortable and stylish children\'s outfits and dresses.', eyebrow: "Children's" },
-}
-
-export async function generateMetadata({ params }: { params: Promise<{ category: string }> }): Promise<Metadata> {
-  const { category } = await params
-  const supabaseServer = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-  
-  const { data } = await supabaseServer.from('categories').select('name, description').eq('slug', category).single()
-  
-  if (data) {
-    return { title: `${data.name} Clothing Online`, description: data.description }
-  }
-  
-  const special = SPECIAL_ROUTES[category]
-  if (special) {
-    return { title: special.title, description: special.description }
-  }
-
-  return { title: 'Shop' }
 }
 
 export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
