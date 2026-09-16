@@ -194,7 +194,22 @@ export default async function Home() {
                   <h3 className="font-serif text-lg text-charcoal group-hover:text-emerald-deep transition-colors line-clamp-1">{product.name}</h3>
                   <p className="text-xs text-ink-faint mt-1 capitalize">{product.gender}</p>
                 </div>
-                <p className="text-sm text-charcoal shrink-0">PKR {product.price.toLocaleString()}</p>
+                <div className="flex items-center gap-2 shrink-0">
+                  {product.sale_price ? (
+                    <>
+                      <span className="text-sm font-semibold text-[#8B4513]">
+                        PKR {product.sale_price.toLocaleString()}
+                      </span>
+                      <span className="text-xs text-ink-faint line-through">
+                        PKR {product.price.toLocaleString()}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-sm text-charcoal">
+                      PKR {product.price.toLocaleString()}
+                    </span>
+                  )}
+                </div>
               </div>
             </Link>
           ))}
