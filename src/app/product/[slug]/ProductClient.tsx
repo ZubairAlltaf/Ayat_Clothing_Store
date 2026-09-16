@@ -160,6 +160,8 @@ export default function ProductClient({
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 50vw"
                   priority
+                  onContextMenu={(e) => e.preventDefault()}
+                  draggable={false}
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-ink-faint">
@@ -184,7 +186,7 @@ export default function ProductClient({
                     }`}
                     aria-label={`View image ${i + 1}`}
                   >
-                    <Image src={img.image_url} alt={img.alt_text || ''} fill className="object-cover" sizes="80px" />
+                    <Image src={img.image_url} alt={img.alt_text || ''} fill className="object-cover" sizes="80px" onContextMenu={(e) => e.preventDefault()} draggable={false} />
                   </button>
                 ))}
               </div>
@@ -394,13 +396,15 @@ export default function ProductClient({
               {relatedProducts.map((rp) => (
                 <Link key={rp.id} href={`/product/${rp.slug}`} className="group">
                   <div className="aspect-[3/4] bg-parchment overflow-hidden relative mb-3">
-                    {rp.image_url ? (
+                    {rp.product_images?.[0]?.image_url ? (
                       <Image
-                        src={rp.image_url}
+                        src={rp.product_images[0].image_url}
                         alt={rp.name}
                         fill
                         className="object-cover transition-transform duration-700 group-hover:scale-105"
                         sizes="(max-width: 768px) 50vw, 25vw"
+                        onContextMenu={(e) => e.preventDefault()}
+                        draggable={false}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-ink-faint">

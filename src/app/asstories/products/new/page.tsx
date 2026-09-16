@@ -119,7 +119,13 @@ export default function NewProductPage() {
               const file = images[i]
               const formData = new FormData()
               formData.append('file', file)
-              formData.append('fileName', file.name)
+              
+              // Create a clean filename: ayat-productname-random.ext
+              const ext = file.name.split('.').pop() || 'jpg'
+              const cleanName = form.name.toLowerCase().replace(/[^a-z0-9]/g, '-')
+              const randomString = Math.random().toString(36).substring(2, 8)
+              formData.append('fileName', `ayat-${cleanName}-${randomString}.${ext}`)
+              
               formData.append('publicKey', process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY!)
               formData.append('signature', authData.signature)
               formData.append('expire', authData.expire.toString())

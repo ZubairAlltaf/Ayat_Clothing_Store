@@ -124,7 +124,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
       query = query.eq('is_new_arrival', true)
     } else if (category === 'sale') {
       query = query.eq('is_on_sale', true)
-    } else if (['women', 'men', 'children'].includes(category)) {
+    } else if (['women', 'men', 'children', 'unisex'].includes(category)) {
       query = query.eq('gender', category)
     } else if (categoryId) {
       // Dynamic database category
@@ -179,7 +179,14 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                     sizes="(max-width: 1024px) 50vw, 25vw"
+                    onContextMenu={(e) => e.preventDefault()}
+                    draggable={false}
                   />
+                  {product.stock_quantity <= 0 && (
+                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 text-[10px] font-bold tracking-widest text-charcoal uppercase shadow-sm z-20">
+                      Out of Stock
+                    </div>
+                  )}
                   {product.is_new_arrival && (
                     <span className="absolute top-3 left-3 z-10 bg-champagne/90 text-charcoal px-2.5 py-1 text-[0.55rem] font-semibold tracking-[0.12em] uppercase">
                       New
@@ -200,9 +207,10 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
                   {/* Quick add on hover */}
                   <div className="absolute bottom-0 left-0 right-0 z-10 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
                     <button
-                      className="w-full bg-charcoal/90 text-champagne py-3 eyebrow text-[0.6rem] flex items-center justify-center gap-2 hover:bg-emerald-deep transition-colors"
+                      className="w-full bg-charcoal/90 text-champagne py-3 eyebrow text-[0.6rem] flex items-center justify-center gap-2 hover:bg-emerald-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-charcoal/90"
+                      disabled={product.stock_quantity <= 0}
                     >
-                      <ShoppingBag size={13} /> Quick Add
+                      <ShoppingBag size={13} /> {product.stock_quantity <= 0 ? 'Sold Out' : 'Quick Add'}
                     </button>
                   </div>
                 </div>

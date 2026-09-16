@@ -181,6 +181,8 @@ export default async function Home() {
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                   sizes="(max-width: 1024px) 50vw, 25vw"
+                  onContextMenu={(e) => e.preventDefault()}
+                  draggable={false}
                 />
                 <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 {product.stock_quantity <= 0 && (
@@ -242,7 +244,14 @@ export default async function Home() {
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                     sizes="(max-width: 1024px) 50vw, 25vw"
+                    onContextMenu={(e) => e.preventDefault()}
+                    draggable={false}
                   />
+                  {product.stock_quantity <= 0 && (
+                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 text-[10px] font-bold tracking-widest text-charcoal uppercase shadow-sm z-10">
+                      Out of Stock
+                    </div>
+                  )}
                   {product.offer_end_time && (
                     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 w-[90%] flex justify-center">
                       <CountdownTimer targetDate={product.offer_end_time} />

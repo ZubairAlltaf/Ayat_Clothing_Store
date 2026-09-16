@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Package, ShoppingCart, CreditCard,
   FolderOpen, Layers, Tag, Star, Users, Image,
-  Mail, Settings, ChevronLeft, Menu, X
+  Mail, Settings, ChevronLeft, Menu, X, MessageCircle
 } from 'lucide-react'
 
 const sidebarLinks = [
@@ -22,6 +22,7 @@ const sidebarLinks = [
   { label: 'Customers', href: '/asstories/customers', icon: Users },
   { label: 'Hero Banners', href: '/asstories/hero-banners', icon: Image },
   { label: 'Newsletter', href: '/asstories/newsletter', icon: Mail },
+  { label: 'Messages', href: '/asstories/messages', icon: MessageCircle },
   { label: 'Settings', href: '/asstories/settings', icon: Settings },
 ]
 
